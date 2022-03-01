@@ -3,6 +3,7 @@ package migrations
 import (
 	"log"
 
+	"github.com/nguyen-phi-khanh-monorevo/go-clean-architech-1/internal/entities"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 )
@@ -13,5 +14,5 @@ func Migrate(connection string) {
 	if err != nil {
 		log.Fatalln(err)
 	}
-	log.Println(db)
+	entities.Migrate(db)
 }
