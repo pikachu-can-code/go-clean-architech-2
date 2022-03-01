@@ -2,7 +2,6 @@ package middleware
 
 import (
 	"errors"
-	"fmt"
 	"net/http"
 	"strings"
 
@@ -10,6 +9,7 @@ import (
 	"github.com/nguyen-phi-khanh-monorevo/go-clean-architech-1/common"
 	"github.com/nguyen-phi-khanh-monorevo/go-clean-architech-1/components"
 	"github.com/nguyen-phi-khanh-monorevo/go-clean-architech-1/components/tokenprovider/jwt"
+	"github.com/nguyen-phi-khanh-monorevo/go-clean-architech-1/internal/usecases/repository"
 )
 
 var ignoreMethod = []string{
@@ -20,9 +20,9 @@ func ErrWrongAuthHeader(err error) *common.AppError {
 	return common.NewFullErrorResponse(
 		http.StatusUnauthorized,
 		err,
-		fmt.Sprintf("wrong authen header"),
+		"wrong authen header",
 		err.Error(),
-		fmt.Sprintf("ErrWrongAuthHeader"),
+		"ErrWrongAuthHeader",
 	)
 }
 
@@ -56,14 +56,14 @@ func RequireAuth(appCtx components.AppContext) gin.HandlerFunc {
 		// ====================================================
 
 		db := appCtx.GetMainDBConnection()
-		store := userstorage.NewSQLStore(db)
+		repo := repository.NewUserRepo(db, appCtx)
 
 		payload, err := tokenProvider.Validate(token)
 		if err != nil {
 			panic(err)
 		}
 
-		user, err := store.FindUser(c.Request.Context(), map[string]interface{}{"id": payload.UserID})
+		user, err := repo.FindUser(c.Request.Context(), map[string]interface{}{"id": payload.UserID})
 		if err != nil {
 			panic(err)
 		}
