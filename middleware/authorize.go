@@ -73,6 +73,7 @@ func RequireAuth(appCtx components.AppContext) gin.HandlerFunc {
 		}
 
 		c.Set(common.CurrentUser, user)
+		c.Set(common.TokenUser, token)
 		c.Next()
 	}
 }

@@ -8,8 +8,10 @@ const (
 	DbTypeLink
 )
 
-const CurrentUser = "__user__"
-const TokenUser = "__token__"
+const (
+	CurrentUser = "__user__"
+	TokenUser   = "__token__"
+)
 
 const TimeLayout = time.RFC3339
 
