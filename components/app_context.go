@@ -1,4 +1,4 @@
-package component
+package components
 
 import (
 	"github.com/nguyen-phi-khanh-monorevo/go-clean-architech-1/common"

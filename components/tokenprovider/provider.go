@@ -26,7 +26,7 @@ type Provider interface {
 
 var (
 	ErrNotFound = common.NewFullErrorResponse(
-		http.StatusForbidden,
+		http.StatusUnauthorized,
 		errors.New("token not found"),
 		"Không tìm thấy token!",
 		"token not found",
@@ -34,7 +34,7 @@ var (
 	)
 
 	ErrEncodingToken = common.NewFullErrorResponse(
-		http.StatusForbidden,
+		http.StatusUnauthorized,
 		errors.New("error encoding the token"),
 		"token not found",
 		"Lỗi khi tạo token",
@@ -42,7 +42,7 @@ var (
 	)
 
 	ErrInvalidToken = common.NewFullErrorResponse(
-		http.StatusForbidden,
+		http.StatusUnauthorized,
 		errors.New("invalid token provided"),
 		"Token xác thực không đúng!",
 		"invalid token provideds",
