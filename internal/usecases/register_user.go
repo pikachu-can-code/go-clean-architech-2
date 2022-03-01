@@ -15,7 +15,7 @@ type RegisterUserRepo interface {
 }
 
 type RegisterUserTransport interface {
-	CallAPIInMicroserviceBlaBla(ctx context.Context, user entities.User) (entities.User, error)
+	CallAPIInMicroserviceBlaBla(ctx context.Context, user *entities.User) (*entities.User, error)
 }
 
 type registerUserUsecase struct {
@@ -29,8 +29,14 @@ func NewRegisterUserUsecase(repo RegisterUserRepo, transport RegisterUserTranspo
 }
 
 func (u *registerUserUsecase) Register(ctx context.Context, data *entities.User) (err error) {
-	if user, _ := u.repo.FindUser(ctx, map[string]interface{}{"email": data.Email}); user != nil {
-		return entities.ErrEmailExisted
+	if user, err := u.repo.FindUser(ctx, map[string]interface{}{"email": data.Email}); user != nil || err != nil {
+		if user != nil {
+			return entities.ErrEmailExisted
+		}
+		if err != nil && err != common.RecordNotFound {
+			u.appCtx.GetLogging().Debug("alo")
+			return err
+		}
 	}
 
 	data.Password, err = hasher.HashPassword(data.Password)
@@ -41,5 +47,15 @@ func (u *registerUserUsecase) Register(ctx context.Context, data *entities.User)
 	if err := u.repo.Create(ctx, data); err != nil {
 		return err
 	}
+
+	// Call api orhter service to process
+	data, err = u.transport.CallAPIInMicroserviceBlaBla(ctx, data)
+	if err != nil {
+		return err
+	}
+
+	// logging value
+	u.appCtx.GetLogging().Infof("user data: %v", data)
+
 	return
 }

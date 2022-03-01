@@ -15,7 +15,7 @@ func NewUserTransport(appCtx components.AppContext) *userTransport {
 	return &userTransport{appCtx: appCtx}
 }
 
-func (t *userTransport) CallAPIInMicroserviceBlaBla(ctx context.Context, user entities.User) (entities.User, error) {
+func (t *userTransport) CallAPIInMicroserviceBlaBla(ctx context.Context, user *entities.User) (*entities.User, error) {
 	// Call some api
 	return user, nil
 }

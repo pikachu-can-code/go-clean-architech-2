@@ -12,10 +12,6 @@ import (
 	"github.com/nguyen-phi-khanh-monorevo/go-clean-architech-1/internal/usecases/repository"
 )
 
-var ignoreMethod = []string{
-	"/helth_check",
-}
-
 func ErrWrongAuthHeader(err error) *common.AppError {
 	return common.NewFullErrorResponse(
 		http.StatusUnauthorized,
@@ -45,15 +41,6 @@ func RequireAuth(appCtx components.AppContext) gin.HandlerFunc {
 		if err != nil {
 			panic(err)
 		}
-
-		// ========== IGNORE METHOD NOT NEED AUTH =============
-		// method := c.Request.URL.Path
-		// for _, imethod := range ignoreMethod {
-		// 	if method == imethod {
-		// 		c.Next()
-		// 	}
-		// }
-		// ====================================================
 
 		db := appCtx.GetMainDBConnection()
 		repo := repository.NewUserRepo(db, appCtx)
