@@ -2,6 +2,12 @@
 
 golang clean architech 1
 
+### Create environment file
+
+`cp .env.example.yml .env.yml`
+
+- Then edit data in .env.yml file for your environment
+
 ### Generate protobuf
 
 - Install buf: https://docs.buf.build/installation/
