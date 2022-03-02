@@ -57,5 +57,8 @@ func (u *registerUserUsecase) Register(ctx context.Context, data *entities.User)
 	// logging value
 	u.appCtx.GetLogging().Infof("user data: %v", data)
 
+	// Gen new uid for this account
+	data.SQLModel.GenUID(common.DbTypeAccount)
+
 	return
 }
