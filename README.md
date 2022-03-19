@@ -67,3 +67,18 @@ tx.Exec("INSERT INTO permissions (id, name, created_at, updated_at) VALUES (1, '
 // Down
 tx.Exec("DELETE from permissions WHERE name='ping';")
 ```
+
+### RUN local
+
+#### With terminal
+
+```
+go run main.go
+```
+
+#### With docker
+
+```
+docker build . -t templatego
+docker run -p 8080:8080 templatego
+```
