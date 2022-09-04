@@ -24,13 +24,14 @@ func NewRouter(r *gin.Engine, appCtx components.AppContext) {
 		},
 		MaxAge: 30 * time.Minute,
 	}))
+	r.Use(middleware.Recover(appCtx))
+	user := r.Group("/user")
 
-	r.GET("/health_check", func(c *gin.Context) {
+	user.GET("/health_check", func(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{
 			"message": "I am find! ok",
 		})
 	})
-	r.Use(middleware.Recover(appCtx))
 
-	v1.NewRouterV1(r, appCtx)
+	v1.NewRouterV1(user, appCtx)
 }

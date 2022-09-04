@@ -80,7 +80,9 @@ func (l *apiLogger) InitLogger() {
 
 	l.sugarLogger = logger.Sugar()
 	if err := l.sugarLogger.Sync(); err != nil {
-		l.sugarLogger.Error(err)
+		if err.Error() != "sync /dev/stderr: invalid argument" {
+			l.sugarLogger.Error(err)
+		}
 	}
 }
 

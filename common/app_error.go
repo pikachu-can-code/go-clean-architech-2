@@ -151,6 +151,26 @@ func ErrNoPermission(err error) *AppError {
 	)
 }
 
+func ErrRequestCanceled() *AppError {
+	return NewFullErrorResponse(
+		499,
+		errors.New("request is canceled"),
+		"Request canceled!",
+		"request is canceled",
+		"ErrRequestCanceled",
+	)
+}
+
+func ErrDeadlineExceeded() *AppError {
+	return NewFullErrorResponse(
+		http.StatusRequestTimeout,
+		errors.New("deadline is exceeded"),
+		"Deadline is exceeded!",
+		"deadline is exceeded",
+		"ErrDeadlineExceeded",
+	)
+}
+
 var ErrWrongUID = NewCustomError(
 	errors.New("wrong uid"),
 	"wrong uid",
