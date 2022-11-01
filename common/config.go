@@ -21,6 +21,7 @@ type Env struct {
 	FirebaseService   string
 	BaseEmailPassword string
 	DefaultEndpoint   string
+	IsDeployed        bool
 }
 
 func checkEnvFile(file string) error {
@@ -35,16 +36,16 @@ func getEnvVar(key string) string {
 
 func Init(dirFile string) Env {
 	valDeployed := os.Getenv("DEPLOYED")
-	isDeployed := false
 	var env Env
+	env.IsDeployed = false
 	if valDeployed != "" {
 		var err error
-		isDeployed, err = strconv.ParseBool(valDeployed)
+		env.IsDeployed, err = strconv.ParseBool(valDeployed)
 		if err != nil {
 			log.Fatalf("error get env: %v", err)
 		}
 	}
-	if !isDeployed {
+	if !env.IsDeployed {
 		if err := checkEnvFile(dirFile); err != nil {
 			log.Fatalf("Error read env %s", err)
 		}
@@ -74,27 +75,6 @@ func Init(dirFile string) Env {
 		env.FirebaseService = os.Getenv("FIREBASE_SERVICE")
 		env.BaseEmailPassword = os.Getenv("EMAIL")
 		env.DefaultEndpoint = os.Getenv("DEFAULT_ENDPOINT")
-
-		// dbPass, err := ioutil.ReadFile(env.DBPassword)
-		// if err != nil {
-		// 	log.Fatal(err)
-		// }
-		// env.DBPassword = string(dbPass)
-		// s3, err := ioutil.ReadFile(env.S3Secret)
-		// if err != nil {
-		// 	log.Fatal(err)
-		// }
-		// env.S3Secret = string(s3)
-		// jwt, err := ioutil.ReadFile(env.SecretKeyJWT)
-		// if err != nil {
-		// 	log.Fatal(err)
-		// }
-		// env.SecretKeyJWT = string(jwt)
-		// mailPass, err := ioutil.ReadFile(env.BaseEmailPassword)
-		// if err != nil {
-		// 	log.Fatal(mailPass)
-		// }
-		// env.BaseEmailPassword = string(mailPass)
 	}
 	return env
 }

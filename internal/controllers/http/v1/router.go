@@ -6,6 +6,7 @@ import (
 )
 
 func NewRouterV1(r *gin.RouterGroup, appCtx components.AppContext) {
+	//define API user version 1
 	v1 := r.Group("/v1")
 	{
 		v1.POST("/register", RegisterUser(appCtx))

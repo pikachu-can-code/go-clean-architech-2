@@ -12,7 +12,7 @@ import (
 )
 
 func NewRouter(r *gin.Engine, appCtx components.AppContext) {
-
+	// config CORS
 	r.Use(cors.New(cors.Config{
 		AllowOrigins:     []string{"*"},
 		AllowMethods:     []string{"PUT", "PATCH", "POST", "GET", "DELETE", "OPTIONS"},
@@ -24,7 +24,11 @@ func NewRouter(r *gin.Engine, appCtx components.AppContext) {
 		},
 		MaxAge: 30 * time.Minute,
 	}))
+
+	// use recovery middleware, this middleware will catch panic and return 500
 	r.Use(middleware.Recover(appCtx))
+
+	// group API to user group: /user/v1/*
 	user := r.Group("/user")
 
 	user.GET("/health_check", func(c *gin.Context) {

@@ -1,7 +1,6 @@
 # go-clean-architech-1
 
 golang clean architech 1
-![golang clean architech 1](docs/img/docs.jpg)
 
 ### Create environment file
 
@@ -9,7 +8,7 @@ golang clean architech 1
 
 - Then edit data in .env.yml file for your environment
 
-### Generate protobuf
+### Generate protobuf (if using grpc)
 
 - Install buf: https://docs.buf.build/installation/
 - Install protoc-gen plugins:
@@ -82,3 +81,6 @@ go run main.go
 docker build . -t templatego
 docker run -p 8080:8080 templatego
 ```
+
+
+![golang clean architech 1](docs/img/docs.jpg)

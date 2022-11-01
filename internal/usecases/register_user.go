@@ -11,7 +11,7 @@ import (
 
 type RegisterUserRepo interface {
 	FindUser(ctx context.Context, conditions map[string]interface{}, moreInfo ...string) (*entities.User, error)
-	Create(ctx context.Context, acc *entities.User) error
+	Create(ctx context.Context, user *entities.UserCreate) (*entities.UserCreate, error)
 }
 
 type RegisterUserTransport interface {
@@ -28,37 +28,39 @@ func NewRegisterUserUsecase(repo RegisterUserRepo, transport RegisterUserTranspo
 	return &registerUserUsecase{repo: repo, transport: transport, appCtx: appCtx}
 }
 
-func (u *registerUserUsecase) Register(ctx context.Context, data *entities.User) (err error) {
+func (u *registerUserUsecase) Register(ctx context.Context, data *entities.UserCreate) (resp *entities.UserCreate, err error) {
 	if user, err := u.repo.FindUser(ctx, map[string]interface{}{"email": data.Email}); user != nil || err != nil {
 		if user != nil {
-			return entities.ErrEmailExisted
+			return nil, entities.ErrEmailExisted
 		}
 		if err != nil && err != common.RecordNotFound {
-			u.appCtx.GetLogging().Debug("alo")
-			return err
+			return nil, err
 		}
 	}
+	u.appCtx.GetLogging().Debug("Sample debug log")
 
 	data.Password, err = hasher.HashPassword(data.Password)
 	if err != nil {
-		return common.ErrInternal(err)
+		return nil, common.ErrInternal(err)
 	}
 
-	if err := u.repo.Create(ctx, data); err != nil {
-		return err
+	if resp, err = u.repo.Create(ctx, data); err != nil {
+		return nil, err
 	}
+	resp.Password = ""
 
 	// Call api orhter service to process
-	data, err = u.transport.CallAPIInMicroserviceBlaBla(ctx, data)
+	userProcess := entities.User{}
+	responseFromMS, err := u.transport.CallAPIInMicroserviceBlaBla(ctx, &userProcess)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	// logging value
-	u.appCtx.GetLogging().Infof("user data: %v", data)
+	u.appCtx.GetLogging().Infof("user data: %v", responseFromMS)
 
 	// Gen new uid for this account
-	data.SQLModel.GenUID(common.DbTypeAccount)
+	resp.SQLModel.GenUID(common.DbTypeAccount)
 
 	return
 }

@@ -14,21 +14,28 @@ import (
 
 func RegisterUser(appCtx components.AppContext) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		var data entities.User
+		var data entities.UserCreate
 
+		// Bind request data to struct
 		if err := c.ShouldBind(&data); err != nil {
 			panic(common.ErrInvalidRequest(err))
 		}
 
+		// declare dependencies and usecases
 		var (
 			repo    = repository.NewUserRepo(appCtx.GetMainDBConnection(), appCtx)
 			transp  = transport.NewUserTransport(appCtx)
 			usecase = usecases.NewRegisterUserUsecase(repo, transp, appCtx)
+			resp *entities.UserCreate
+			err error
 		)
-		if err := usecase.Register(c, &data); err != nil {
+
+		// call usecase
+		if resp, err = usecase.Register(c, &data); err != nil {
 			panic(err)
 		}
 
-		c.JSON(http.StatusOK, common.SimpleSuccessResponse(data))
+		// response
+		c.JSON(http.StatusOK, common.SimpleSuccessResponse(resp))
 	}
 }

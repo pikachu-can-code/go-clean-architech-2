@@ -18,11 +18,11 @@ func NewUserRepo(db *gorm.DB, appCtx components.AppContext) *userRepo {
 	return &userRepo{db: db, appCtx: appCtx}
 }
 
-func (repo *userRepo) Create(ctx context.Context, acc *entities.User) error {
-	if err := repo.db.Table(acc.TableName()).Create(acc).Error; err != nil {
-		return common.ErrCannotCreateEntity(acc.TableName(), err)
+func (repo *userRepo) Create(ctx context.Context, user *entities.UserCreate) (*entities.UserCreate, error) {
+	if err := repo.db.Table(user.TableName()).Create(user).Error; err != nil {
+		return nil, common.ErrCannotCreateEntity("User", err)
 	}
-	return nil
+	return user, nil
 }
 
 func (repo *userRepo) FindUser(ctx context.Context, conditions map[string]interface{}, moreInfo ...string) (*entities.User, error) {

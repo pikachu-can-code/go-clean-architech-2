@@ -1,6 +1,8 @@
 package middleware
 
 import (
+	"errors"
+	"reflect"
 	"runtime/debug"
 
 	"github.com/gin-gonic/gin"
@@ -19,14 +21,17 @@ func Recover(appCtx components.AppContext) gin.HandlerFunc {
 				if appErr, ok := err.(*common.AppError); ok {
 					logger.Errorf("[error] %v\n", appErr.Error())
 					c.AbortWithStatusJSON(appErr.StatusCode, appErr)
-					panic(err)
 				}
 
 				logger.Errorf("[error unknow] %v\n", err)
+				var appErr  *common.AppError
+				if reflect.TypeOf(err) == reflect.TypeOf("string") {
+					appErr = common.ErrInternal(errors.New(err.(string)))
+				} else {
+					appErr = common.ErrInternal(err.(error))
+				}
 				debug.PrintStack()
-				appErr := common.ErrInternal(err.(error))
 				c.AbortWithStatusJSON(appErr.StatusCode, appErr)
-				panic(err)
 			}
 		}()
 
