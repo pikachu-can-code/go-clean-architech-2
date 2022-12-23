@@ -28,11 +28,20 @@ func RegisterUser(appCtx components.AppContext) gin.HandlerFunc {
 
 		// declare dependencies and usecases
 		var (
-			repo    = repository.NewUserRepo(appCtx.GetMainDBConnection(), appCtx)
+			db = appCtx.GetMainDBConnection().Begin()
+			repo    = repository.NewUserRepo(db, appCtx)
 			transp  = transport.NewUserTransport(appCtx, conn)
 			usecase = usecases.NewRegisterUserUsecase(repo, transp, appCtx)
 			resp    *entities.UserCreate
 		)
+		defer func() {
+			conn.Close()
+			if r := recover(); r != nil {
+				db.Rollback()
+				panic(r)
+			}
+			db.Commit()
+		}()
 
 		// call usecase
 		if resp, err = usecase.Register(c, &data); err != nil {
