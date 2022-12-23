@@ -1,0 +1,8 @@
+version: v1
+name: buf.build/nguyen-phi-khanh-monorevo/go-clean-architech-1
+breaking:
+  use:
+    - FILE
+lint:
+  use:
+    - DEFAULT

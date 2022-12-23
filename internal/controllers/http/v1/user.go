@@ -10,6 +10,7 @@ import (
 	"github.com/nguyen-phi-khanh-monorevo/go-clean-architech-1/internal/usecases"
 	"github.com/nguyen-phi-khanh-monorevo/go-clean-architech-1/internal/usecases/repository"
 	"github.com/nguyen-phi-khanh-monorevo/go-clean-architech-1/internal/usecases/transport"
+	"google.golang.org/grpc"
 )
 
 func RegisterUser(appCtx components.AppContext) gin.HandlerFunc {
@@ -20,14 +21,17 @@ func RegisterUser(appCtx components.AppContext) gin.HandlerFunc {
 		if err := c.ShouldBind(&data); err != nil {
 			panic(common.ErrInvalidRequest(err))
 		}
+		conn, err := grpc.Dial(appCtx.GetEnv().UserServiceEndpoint, grpc.WithInsecure())
+		if err != nil {
+			panic(err)
+		}
 
 		// declare dependencies and usecases
 		var (
 			repo    = repository.NewUserRepo(appCtx.GetMainDBConnection(), appCtx)
-			transp  = transport.NewUserTransport(appCtx)
+			transp  = transport.NewUserTransport(appCtx, conn)
 			usecase = usecases.NewRegisterUserUsecase(repo, transp, appCtx)
-			resp *entities.UserCreate
-			err error
+			resp    *entities.UserCreate
 		)
 
 		// call usecase

@@ -9,19 +9,20 @@ import (
 )
 
 type Env struct {
-	DBConnectionStr   string
-	DBPassword        string
-	HttpPort          string
-	S3BucketName      string
-	S3Region          string
-	S3APIKey          string
-	S3Secret          string
-	S3Domain          string
-	SecretKeyJWT      string
-	FirebaseService   string
-	BaseEmailPassword string
-	DefaultEndpoint   string
-	IsDeployed        bool
+	DBConnectionStr     string
+	DBPassword          string
+	HttpPort            string
+	S3BucketName        string
+	S3Region            string
+	S3APIKey            string
+	S3Secret            string
+	S3Domain            string
+	SecretKeyJWT        string
+	FirebaseService     string
+	BaseEmailPassword   string
+	DefaultEndpoint     string
+	IsDeployed          bool
+	UserServiceEndpoint string
 }
 
 func checkEnvFile(file string) error {
@@ -62,6 +63,7 @@ func Init(dirFile string) Env {
 		env.FirebaseService = getEnvVar("FIREBASE_SERVICE")
 		env.BaseEmailPassword = getEnvVar("EMAIL")
 		env.DefaultEndpoint = getEnvVar("DEFAULT_ENDPOINT")
+		env.UserServiceEndpoint = getEnvVar("USER_SERVICE_ENDPOINT")
 	} else {
 		env.DBConnectionStr = os.Getenv("DB_CONNECTION")
 		env.DBPassword = os.Getenv("DB_PASSWORD")
@@ -75,6 +77,7 @@ func Init(dirFile string) Env {
 		env.FirebaseService = os.Getenv("FIREBASE_SERVICE")
 		env.BaseEmailPassword = os.Getenv("EMAIL")
 		env.DefaultEndpoint = os.Getenv("DEFAULT_ENDPOINT")
+		env.UserServiceEndpoint = os.Getenv("USER_SERVICE_ENDPOINT")
 	}
 	return env
 }

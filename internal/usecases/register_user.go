@@ -7,6 +7,7 @@ import (
 	"github.com/nguyen-phi-khanh-monorevo/go-clean-architech-1/components"
 	"github.com/nguyen-phi-khanh-monorevo/go-clean-architech-1/components/encoder/hasher"
 	"github.com/nguyen-phi-khanh-monorevo/go-clean-architech-1/internal/entities"
+	proto_v1 "github.com/nguyen-phi-khanh-monorevo/go-clean-architech-1/protoc-gen/proto/proto-v1"
 )
 
 type RegisterUserRepo interface {
@@ -15,7 +16,10 @@ type RegisterUserRepo interface {
 }
 
 type RegisterUserTransport interface {
-	CallAPIInMicroserviceBlaBla(ctx context.Context, user *entities.User) (*entities.User, error)
+	CallAPIInMicroserviceBlaBla(
+		ctx context.Context,
+		user *entities.User,
+	) (*proto_v1.UserResponse, error)
 }
 
 type registerUserUsecase struct {
