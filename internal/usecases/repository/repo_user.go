@@ -3,9 +3,9 @@ package repository
 import (
 	"context"
 
-	"github.com/nguyen-phi-khanh-monorevo/go-clean-architech-1/common"
-	"github.com/nguyen-phi-khanh-monorevo/go-clean-architech-1/components"
-	"github.com/nguyen-phi-khanh-monorevo/go-clean-architech-1/internal/entities"
+	"github.com/nguyen-phi-khanh-monorevo/go-clean-architech-2/common"
+	"github.com/nguyen-phi-khanh-monorevo/go-clean-architech-2/components"
+	"github.com/nguyen-phi-khanh-monorevo/go-clean-architech-2/internal/entities"
 	"gorm.io/gorm"
 )
 

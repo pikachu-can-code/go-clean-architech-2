@@ -1,66 +1,81 @@
 package middleware
 
 import (
-	"errors"
-	"net/http"
-	"strings"
+	"context"
 
-	"github.com/gin-gonic/gin"
-	"github.com/nguyen-phi-khanh-monorevo/go-clean-architech-1/common"
-	"github.com/nguyen-phi-khanh-monorevo/go-clean-architech-1/components"
-	"github.com/nguyen-phi-khanh-monorevo/go-clean-architech-1/components/tokenprovider/jwt"
-	"github.com/nguyen-phi-khanh-monorevo/go-clean-architech-1/internal/usecases/repository"
+	grpc_auth "github.com/grpc-ecosystem/go-grpc-middleware/auth"
+	"github.com/nguyen-phi-khanh-monorevo/go-clean-architech-2/common"
+	"github.com/nguyen-phi-khanh-monorevo/go-clean-architech-2/components"
+	"github.com/nguyen-phi-khanh-monorevo/go-clean-architech-2/components/tokenprovider/jwt"
+	"github.com/nguyen-phi-khanh-monorevo/go-clean-architech-2/internal/entities"
+	"google.golang.org/grpc"
 )
 
+var ignoreMethod = []string{
+	"/proto_v1.UserService/Hello",
+}
+
 func ErrWrongAuthHeader(err error) *common.AppError {
-	return common.NewFullErrorResponse(
-		http.StatusUnauthorized,
+	return common.NewCustomError(
 		err,
 		"wrong authen header",
-		err.Error(),
 		"ErrWrongAuthHeader",
 	)
 }
 
-func extractTokenFromHeaderString(s string) (string, error) {
-	parts := strings.Split(s, " ")
-	//"Authorization" : "Bearer {token}"
+func Authenticate(appCtx components.AppContext) func(context.Context) (context.Context, error) {
+	return func(ctx context.Context) (context.Context, error) {
+		// ========== IGNORE METHOD NOT NEED AUTH =============
+		method, _ := grpc.Method(ctx)
+		appCtx.GetLogging().Infof("| %s", method)
+		for _, imethod := range ignoreMethod {
+			if method == imethod {
+				return ctx, nil
+			}
+		}
+		// ====================================================
 
-	if parts[0] != "Bearer" || len(parts) < 2 || strings.TrimSpace(parts[1]) == "" {
-		return "", ErrWrongAuthHeader(nil)
-	}
-
-	return parts[1], nil
-}
-
-func RequireAuth(appCtx components.AppContext) gin.HandlerFunc {
-	tokenProvider := jwt.NewTokenJWTProvider(appCtx.GetSecretKey())
-
-	return func(c *gin.Context) {
-		token, err := extractTokenFromHeaderString(c.GetHeader("Authorization"))
+		token, err := grpc_auth.AuthFromMD(ctx, "Bearer")
 		if err != nil {
-			panic(err)
+			panic(ErrWrongAuthHeader(err))
 		}
 
-		db := appCtx.GetMainDBConnection()
-		repo := repository.NewUserRepo(db, appCtx)
+		tokenProvider := jwt.NewTokenJWTProvider(appCtx.GetSecretKey())
 
 		payload, err := tokenProvider.Validate(token)
 		if err != nil {
 			panic(err)
 		}
 
-		user, err := repo.FindUser(c.Request.Context(), map[string]interface{}{"id": payload.UserID})
-		if err != nil {
-			panic(err)
-		}
+		// store := authstorage.NewSQLStore(appCtx.GetMainDBConnection())
+		// if _, err := store.FindToken(
+		// 	ctx,
+		// 	map[string]interface{}{
+		// 		"token":   token,
+		// 		"auth_id": payload.UserID,
+		// 	}); err != nil {
+		// 	panic(tokenprovider.ErrInvalidToken)
+		// }
 
-		if user.Status == 0 {
-			panic(common.ErrNoPermission(errors.New("user has been deleted or banned")))
-		}
+		// user, err := store.FindAuth(ctx, map[string]interface{}{"id": payload.UserID}, "Role")
+		// if err != nil {
+		// 	if err == common.RecordNotFound {
+		// 		panic(authmodel.ErrUserBannedOrDeleted)
+		// 	}
+		// 	panic(authmodel.ErrCannotGetTokenLogin(err))
+		// }
+		user := entities.User{SQLModel: common.SQLModel{ID: payload.UserID}}
 
-		c.Set(common.CurrentUser, user)
-		c.Set(common.TokenUser, token)
-		c.Next()
+		// admin := false
+		// for _, val := range user.GetRoles() {
+		// 	if val == 5 || val == 6 {
+		// 		admin = true
+		// 	}
+		// }
+		// user.Mask(admin)
+
+		newCtx := context.WithValue(ctx, common.CurrentUser, user)
+		newCtx = context.WithValue(newCtx, common.TokenUser, token)
+		return newCtx, nil
 	}
 }

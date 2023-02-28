@@ -3,14 +3,20 @@ package main
 import (
 	"fmt"
 	"log"
+	"net"
 
-	"github.com/gin-gonic/gin"
-	"github.com/nguyen-phi-khanh-monorevo/go-clean-architech-1/common"
-	"github.com/nguyen-phi-khanh-monorevo/go-clean-architech-1/components"
-	"github.com/nguyen-phi-khanh-monorevo/go-clean-architech-1/components/logging"
-	"github.com/nguyen-phi-khanh-monorevo/go-clean-architech-1/components/mailprovider/mail"
-	"github.com/nguyen-phi-khanh-monorevo/go-clean-architech-1/components/uploadprovider"
-	"github.com/nguyen-phi-khanh-monorevo/go-clean-architech-1/internal/controllers/http"
+	grpc_middleware "github.com/grpc-ecosystem/go-grpc-middleware"
+	grpc_auth "github.com/grpc-ecosystem/go-grpc-middleware/auth"
+	grpc_recovery "github.com/grpc-ecosystem/go-grpc-middleware/recovery"
+	"github.com/nguyen-phi-khanh-monorevo/go-clean-architech-2/common"
+	"github.com/nguyen-phi-khanh-monorevo/go-clean-architech-2/components"
+	"github.com/nguyen-phi-khanh-monorevo/go-clean-architech-2/components/logging"
+	"github.com/nguyen-phi-khanh-monorevo/go-clean-architech-2/components/mailprovider/mail"
+	"github.com/nguyen-phi-khanh-monorevo/go-clean-architech-2/components/uploadprovider"
+	"github.com/nguyen-phi-khanh-monorevo/go-clean-architech-2/internal/controllers/grpc_services_v1"
+	"github.com/nguyen-phi-khanh-monorevo/go-clean-architech-2/middleware"
+	proto_v1 "github.com/nguyen-phi-khanh-monorevo/go-clean-architech-2/protoc-gen/proto/proto-v1"
+	"google.golang.org/grpc"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 )
@@ -50,15 +56,45 @@ func main() {
 	// init App Context, this App Context will be passed to all components
 	appCtx := components.NewAppContext(db, provider, env.SecretKeyJWT, mailProvider, &env, logger)
 
-	// set release mode for gin
-	if env.IsDeployed {
-		gin.SetMode(gin.ReleaseMode)
+	if err := runGrpcServices(appCtx, env.ServerPort, env.HttpPort, env.RunGateway); err != nil {
+		log.Fatalf("Failed to start gRPC Server at port %v with error: %v", env.ServerPort, err)
 	}
-	route := gin.Default()
+}
 
-	http.NewRouter(route, appCtx)
-	err = route.Run(env.HttpPort)
+func runGrpcServices(
+	appCtx components.AppContext,
+	port string,
+	httpPort string,
+	runGateway bool,
+) error {
+	listen, err := net.Listen("tcp", port)
 	if err != nil {
-		log.Fatalf("Cannot start server at port %v with error: %v", env.HttpPort, err)
+		return err
 	}
+	s := grpc.NewServer(
+		grpc_middleware.WithUnaryServerChain(
+			grpc_recovery.UnaryServerInterceptor(middleware.RecoverOptions...),
+			grpc_auth.UnaryServerInterceptor(middleware.Authenticate(appCtx)),
+		),
+		grpc_middleware.WithStreamServerChain(
+			grpc_recovery.StreamServerInterceptor(middleware.RecoverOptions...),
+			grpc_auth.StreamServerInterceptor(middleware.Authenticate(appCtx)),
+		),
+	)
+	//====== Init all services here ======//
+	proto_v1.RegisterUserServiceServer(s, grpc_services_v1.NewGRPCUserServiceV1(&appCtx))
+	proto_v1.RegisterProductServiceServer(s, grpc_services_v1.NewGRPCProductServiceV1(&appCtx))
+	//====================================//
+	go func() {
+		if err := s.Serve(listen); err != nil {
+			log.Fatalf("Failed to start gRPC Server: %v", err)
+		}
+	}()
+	log.Printf("| Serving gRPC on http://0.0.0.0%s...\n", port)
+
+	if runGateway {
+		return RunGateway(port, httpPort)
+	}
+
+	return nil
 }

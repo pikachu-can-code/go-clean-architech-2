@@ -8,8 +8,8 @@ import (
 	"io/ioutil"
 	"net/http"
 
-	"github.com/nguyen-phi-khanh-monorevo/go-clean-architech-1/common"
-	"github.com/nguyen-phi-khanh-monorevo/go-clean-architech-1/components/logging"
+	"github.com/nguyen-phi-khanh-monorevo/go-clean-architech-2/common"
+	"github.com/nguyen-phi-khanh-monorevo/go-clean-architech-2/components/logging"
 )
 
 func MakeRequest(method string, url string, body io.Reader, headers map[string]string) (io.ReadCloser, error) {

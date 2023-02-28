@@ -4,7 +4,7 @@ import (
 	"errors"
 	"net/http"
 
-	"github.com/nguyen-phi-khanh-monorevo/go-clean-architech-1/common"
+	"github.com/nguyen-phi-khanh-monorevo/go-clean-architech-2/common"
 )
 
 type Token struct {

@@ -3,7 +3,7 @@ package entities
 import (
 	"errors"
 
-	"github.com/nguyen-phi-khanh-monorevo/go-clean-architech-1/common"
+	"github.com/nguyen-phi-khanh-monorevo/go-clean-architech-2/common"
 )
 
 const userEntityName = "users"

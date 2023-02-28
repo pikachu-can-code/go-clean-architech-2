@@ -7,7 +7,7 @@ import (
 	"log"
 	"os"
 
-	"github.com/nguyen-phi-khanh-monorevo/go-clean-architech-1/database/migrations"
+	"github.com/nguyen-phi-khanh-monorevo/go-clean-architech-2/database/migrations"
 	"github.com/pressly/goose"
 	_ "gorm.io/driver/mysql"
 )

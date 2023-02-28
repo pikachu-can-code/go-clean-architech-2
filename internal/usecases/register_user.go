@@ -3,11 +3,11 @@ package usecases
 import (
 	"context"
 
-	"github.com/nguyen-phi-khanh-monorevo/go-clean-architech-1/common"
-	"github.com/nguyen-phi-khanh-monorevo/go-clean-architech-1/components"
-	"github.com/nguyen-phi-khanh-monorevo/go-clean-architech-1/components/encoder/hasher"
-	"github.com/nguyen-phi-khanh-monorevo/go-clean-architech-1/internal/entities"
-	proto_v1 "github.com/nguyen-phi-khanh-monorevo/go-clean-architech-1/protoc-gen/proto/proto-v1"
+	"github.com/nguyen-phi-khanh-monorevo/go-clean-architech-2/common"
+	"github.com/nguyen-phi-khanh-monorevo/go-clean-architech-2/components"
+	"github.com/nguyen-phi-khanh-monorevo/go-clean-architech-2/components/encoder/hasher"
+	"github.com/nguyen-phi-khanh-monorevo/go-clean-architech-2/internal/entities"
+	proto_v1 "github.com/nguyen-phi-khanh-monorevo/go-clean-architech-2/protoc-gen/proto/proto-v1"
 )
 
 type RegisterUserRepo interface {

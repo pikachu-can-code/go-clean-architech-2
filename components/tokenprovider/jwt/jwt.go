@@ -4,7 +4,7 @@ import (
 	"time"
 
 	"github.com/golang-jwt/jwt"
-	"github.com/nguyen-phi-khanh-monorevo/go-clean-architech-1/components/tokenprovider"
+	"github.com/nguyen-phi-khanh-monorevo/go-clean-architech-2/components/tokenprovider"
 )
 
 type jwtProvider struct {

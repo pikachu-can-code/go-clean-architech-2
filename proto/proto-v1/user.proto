@@ -2,7 +2,9 @@ syntax = "proto3";
 
 package proto_v1;
 
-option go_package="github.com/nguyen-phi-khanh-monorevo/go-clean-architech-1/protoc-gen/proto-v1";
+option go_package="github.com/nguyen-phi-khanh-monorevo/go-clean-architech-2/protoc-gen/proto-v1";
+
+import "google/api/annotations.proto";
 
 message UserRequest {
   string id = 1;
@@ -13,5 +15,10 @@ message UserResponse {
 }
 
 service UserService {
-  rpc Hello (UserRequest) returns (UserResponse) {}
+  rpc Hello (UserRequest) returns (UserResponse) {
+      option (google.api.http) = {
+            post: "/user/v1/hello"
+            body: "*"
+      };
+  }
 }

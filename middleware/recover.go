@@ -1,40 +1,47 @@
 package middleware
 
 import (
-	"errors"
-	"reflect"
+	"fmt"
 	"runtime/debug"
 
-	"github.com/gin-gonic/gin"
-	"github.com/nguyen-phi-khanh-monorevo/go-clean-architech-1/common"
-	"github.com/nguyen-phi-khanh-monorevo/go-clean-architech-1/components"
-	"github.com/nguyen-phi-khanh-monorevo/go-clean-architech-1/components/logging"
+	grpc_recovery "github.com/grpc-ecosystem/go-grpc-middleware/recovery"
+	"github.com/nguyen-phi-khanh-monorevo/go-clean-architech-2/common"
+	"github.com/nguyen-phi-khanh-monorevo/go-clean-architech-2/components/logging"
+	"google.golang.org/genproto/googleapis/rpc/errdetails"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 )
 
-func Recover(appCtx components.AppContext) gin.HandlerFunc {
-	return func(c *gin.Context) {
-		defer func() {
-			if err := recover(); err != nil {
-				logger := logging.NewAPILogger()
-				c.Header("Content-Type", "application/json")
-
-				if appErr, ok := err.(*common.AppError); ok {
-					logger.Errorf("[error] %v\n", appErr.Error())
-					c.AbortWithStatusJSON(appErr.StatusCode, appErr)
-				}
-
-				logger.Errorf("[error unknow] %v\n", err)
-				var appErr  *common.AppError
-				if reflect.TypeOf(err) == reflect.TypeOf("string") {
-					appErr = common.ErrInternal(errors.New(err.(string)))
-				} else {
-					appErr = common.ErrInternal(err.(error))
-				}
-				debug.PrintStack()
-				c.AbortWithStatusJSON(appErr.StatusCode, appErr)
-			}
-		}()
-
-		c.Next()
+func errorHandler(p interface{}) error {
+	logger := logging.NewAPILogger()
+	if appErr, ok := p.(*common.AppError); ok {
+		logger.Errorf("[error] %v", appErr.Error())
+		status := status.New(appErr.StatusCode, appErr.Message)
+		detail := &errdetails.ErrorInfo{
+			Reason:   appErr.Error(),
+			Metadata: map[string]string{"Key": appErr.Key},
+		}
+		st, _ := status.WithDetails(detail)
+		return st.Err()
 	}
+	if err, isErr := p.(error); isErr {
+		if grpcErr, ok := status.FromError(err); ok {
+			debug.PrintStack()
+			logger.Errorf("[error] %v", grpcErr.Err())
+			return grpcErr.Err()
+		}
+	}
+
+	logger.Errorf("[error unknow] %v", p)
+	debug.PrintStack()
+	status := status.New(codes.Unknown, "Đã có lỗi xảy ra!")
+	detail := &errdetails.ErrorInfo{
+		Reason: fmt.Sprintf("error %v", p),
+	}
+	st, _ := status.WithDetails(detail)
+	return st.Err()
+}
+
+var RecoverOptions = []grpc_recovery.Option{
+	grpc_recovery.WithRecoveryHandler(errorHandler),
 }

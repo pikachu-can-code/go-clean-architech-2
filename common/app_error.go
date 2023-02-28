@@ -6,19 +6,21 @@ import (
 	"log"
 	"net/http"
 	"strings"
+
+	"google.golang.org/grpc/codes"
 )
 
 type AppError struct {
-	StatusCode int    `json:"status_code"`
-	RootErr    error  `json:"-"`
-	Message    string `json:"message"`
-	Log        string `json:"log"`
-	Key        string `json:"error_key"`
+	StatusCode codes.Code `json:"status_code"`
+	RootErr    error      `json:"-"`
+	Message    string     `json:"message"`
+	Log        string     `json:"log"`
+	Key        string     `json:"error_key"`
 }
 
 func NewErrorBadRequest(root error, msg, log, key string) *AppError {
 	return &AppError{
-		StatusCode: http.StatusBadRequest,
+		StatusCode: codes.InvalidArgument,
 		RootErr:    root,
 		Message:    msg,
 		Log:        log,
@@ -26,7 +28,7 @@ func NewErrorBadRequest(root error, msg, log, key string) *AppError {
 	}
 }
 
-func NewFullErrorResponse(statusCode int, root error, msg, log, key string) *AppError {
+func NewFullErrorResponse(statusCode codes.Code, root error, msg, log, key string) *AppError {
 	return &AppError{
 		StatusCode: statusCode,
 		RootErr:    root,
@@ -38,7 +40,7 @@ func NewFullErrorResponse(statusCode int, root error, msg, log, key string) *App
 
 func NewUnauthorized(root error, msg, log, key string) *AppError {
 	return &AppError{
-		StatusCode: http.StatusUnauthorized,
+		StatusCode: codes.Unauthenticated,
 		RootErr:    root,
 		Message:    msg,
 		Log:        log,
@@ -67,16 +69,16 @@ func (e *AppError) RootError() error {
 }
 
 func ErrDB(err error) *AppError {
-	return NewFullErrorResponse(http.StatusInternalServerError, err, "something went wrong with DB", err.Error(), "DB_ERROR")
+	return NewFullErrorResponse(codes.Internal, err, "Something went wrong with DB", err.Error(), "DB_ERROR")
 }
 
 func ErrInvalidRequest(err error) *AppError {
-	return NewErrorBadRequest(err, "invalid request", err.Error(), "ErrInvalidRequest")
+	return NewErrorBadRequest(err, "Invalid request", err.Error(), "ErrInvalidRequest")
 }
 
 func ErrInternal(err error) *AppError {
-	return NewFullErrorResponse(http.StatusInternalServerError, err,
-		"something went wrong in the server", err.Error(), "ErrInternal")
+	return NewFullErrorResponse(codes.Internal, err,
+		"Something went wrong in the server", err.Error(), "ErrInternal")
 }
 
 func ErrCannotListEntity(entity string, err error) *AppError {
@@ -153,7 +155,7 @@ func ErrNoPermission(err error) *AppError {
 
 func ErrRequestCanceled() *AppError {
 	return NewFullErrorResponse(
-		499,
+		codes.Canceled,
 		errors.New("request is canceled"),
 		"Request canceled!",
 		"request is canceled",
@@ -163,7 +165,7 @@ func ErrRequestCanceled() *AppError {
 
 func ErrDeadlineExceeded() *AppError {
 	return NewFullErrorResponse(
-		http.StatusRequestTimeout,
+		codes.DeadlineExceeded,
 		errors.New("deadline is exceeded"),
 		"Deadline is exceeded!",
 		"deadline is exceeded",
@@ -173,7 +175,7 @@ func ErrDeadlineExceeded() *AppError {
 
 var ErrWrongUID = NewCustomError(
 	errors.New("wrong uid"),
-	"wrong uid",
+	"Wrong uid",
 	"ErrWrongUID",
 )
 

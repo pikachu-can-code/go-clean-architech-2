@@ -3,7 +3,7 @@ package uploadprovider
 import (
 	"context"
 
-	"github.com/nguyen-phi-khanh-monorevo/go-clean-architech-1/common"
+	"github.com/nguyen-phi-khanh-monorevo/go-clean-architech-2/common"
 )
 
 type UploadProvider interface {

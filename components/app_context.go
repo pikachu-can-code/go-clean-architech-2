@@ -1,10 +1,10 @@
 package components
 
 import (
-	"github.com/nguyen-phi-khanh-monorevo/go-clean-architech-1/common"
-	"github.com/nguyen-phi-khanh-monorevo/go-clean-architech-1/components/logging"
-	"github.com/nguyen-phi-khanh-monorevo/go-clean-architech-1/components/mailprovider/mail"
-	"github.com/nguyen-phi-khanh-monorevo/go-clean-architech-1/components/uploadprovider"
+	"github.com/nguyen-phi-khanh-monorevo/go-clean-architech-2/common"
+	"github.com/nguyen-phi-khanh-monorevo/go-clean-architech-2/components/logging"
+	"github.com/nguyen-phi-khanh-monorevo/go-clean-architech-2/components/mailprovider/mail"
+	"github.com/nguyen-phi-khanh-monorevo/go-clean-architech-2/components/uploadprovider"
 
 	"gorm.io/gorm"
 )

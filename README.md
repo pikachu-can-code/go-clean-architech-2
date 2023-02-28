@@ -1,6 +1,6 @@
-# go-clean-architech-1
+# go-clean-architech-2
 
-golang clean architech 1
+golang clean architech 2
 
 ### Create environment file
 
@@ -14,9 +14,9 @@ golang clean architech 1
 - Install protoc-gen plugins:
 
 ```
-go get github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-grpc-gateway
-go get google.golang.org/protobuf/cmd/protoc-gen-go
-go get google.golang.org/grpc/cmd/protoc-gen-go-grpc
+go install github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-grpc-gateway@latest
+go install google.golang.org/protobuf/cmd/protoc-gen-go@latest
+go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@latest
 ```
 
 - Generate protobuf:
@@ -30,7 +30,7 @@ buf generate
 install goose
 
 ```
-go get -u github.com/pressly/goose/cmd/goose
+go install github.com/pressly/goose/cmd/goose@latest
 ```
 
 go inside migration folder

@@ -1,7 +1,9 @@
 package logging
 
 import (
+	"errors"
 	"os"
+	"syscall"
 
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
@@ -79,10 +81,8 @@ func (l *apiLogger) InitLogger() {
 	logger := zap.New(core, zap.AddCaller(), zap.AddCallerSkip(1))
 
 	l.sugarLogger = logger.Sugar()
-	if err := l.sugarLogger.Sync(); err != nil {
-		if err.Error() != "sync /dev/stderr: invalid argument" {
-			l.sugarLogger.Error(err)
-		}
+	if err := l.sugarLogger.Sync(); err != nil && !errors.Is(err, syscall.ENOTTY) {
+		l.sugarLogger.Error(err)
 	}
 }
 

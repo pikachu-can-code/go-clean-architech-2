@@ -1,0 +1,27 @@
+syntax = "proto3";
+
+package proto_v1;
+
+option go_package="github.com/nguyen-phi-khanh-monorevo/go-clean-architech-2/protoc-gen/proto-v1";
+
+import "google/api/annotations.proto";
+import "proto/proto-v1/user.proto";
+
+message ProductRequest {
+  string id = 1;
+  string user_id = 2;
+}
+
+message ProductResponse {
+  string message = 1;
+  UserResponse user = 2;
+}
+
+service ProductService {
+  	rpc Hello (ProductRequest) returns (ProductResponse) {
+  		option (google.api.http) = {
+            post: "/product/v1/hello"
+            body: "*"
+    	};
+  	}
+}
