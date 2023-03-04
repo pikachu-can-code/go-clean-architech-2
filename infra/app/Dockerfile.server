@@ -1,7 +1,8 @@
-FROM golang:1.16 AS builder
+FROM golang:1.17 AS builder
 
 ENV GO111MODULE 'on'
 ENV GOPROXY 'https://proxy.golang.org,direct'
+ENV TZ='Asia/Ho_Chi_Minh'
 
 RUN mkdir -p /app
 

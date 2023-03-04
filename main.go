@@ -23,10 +23,11 @@ import (
 
 func main() {
 	fmt.Println("____CLEAN ARCHITECH Khanh chế____")
-	env := common.Init(".env.yml")
+	env := common.Init(".env")
 
 	// init sql connection, this connection will keep alive until the app is closed
-	connStr := fmt.Sprintf(env.DBConnectionStr, env.DBPassword)
+	connStr := env.DBConnectionStr
+	fmt.Println(connStr)
 	db, err := gorm.Open(mysql.Open(connStr), &gorm.Config{})
 	// use db Debug to see sql query
 	// db = db.Debug()

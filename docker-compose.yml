@@ -1,0 +1,65 @@
+version: '3.9'
+
+services:
+  app:
+    container_name: app
+    build:
+      context: .
+      dockerfile: ./infra/app/Dockerfile.local
+    env_file: .env
+    entrypoint: sh -c './scripts/dev.sh'
+    volumes:
+      - .:/app:cached
+    ports:
+      - 5678:5678
+      - 8000:8000
+    depends_on:
+      mysql:
+        condition: service_healthy
+    deploy:
+      restart_policy:
+          condition: on-failure
+          delay: 3s
+          max_attempts: 5
+          window: 60s
+
+  app-ut:
+    container_name: app-for-ut
+    build:
+      context: .
+      dockerfile: ./infra/app/Dockerfile.local
+    env_file: .env-ut
+    volumes:
+      - .:/app:cached
+    ports:
+      - 5678:5678
+      - 8001:8000
+    depends_on:
+      mysql:
+        condition: service_healthy
+
+  nginx:
+    container_name: app-nginx
+    build:
+      context: ./infra/nginx
+      dockerfile: Dockerfile
+      target: local
+    env_file: .env
+    ports:
+      - 81:80
+    depends_on:
+      app:
+        condition: service_started
+
+  mysql:
+    container_name: app-mysql
+    image: mysql:8.0.32
+    platform: linux/x86_64
+    env_file: .env
+    ports:
+      - 3307:3306
+    healthcheck:
+      test: mysqladmin ping -h localhost -u$$MYSQL_USER -p$$MYSQL_PASSWORD && sleep 5s
+      retries: 6
+      interval: 5s
+      timeout: 30s
