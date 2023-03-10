@@ -12,7 +12,7 @@ import (
 
 type RegisterUserRepo interface {
 	FindUser(ctx context.Context, conditions map[string]interface{}, moreInfo ...string) (*entities.User, error)
-	Create(ctx context.Context, user *entities.UserCreate) (*entities.UserCreate, error)
+	Create(ctx context.Context, user *entities.UserCreate, userRole *entities.UserRoleCreate) (*entities.UserCreate, error)
 }
 
 type RegisterUserTransport interface {
@@ -28,11 +28,18 @@ type registerUserUsecase struct {
 	appCtx    components.AppContext
 }
 
-func NewRegisterUserUsecase(repo RegisterUserRepo, transport RegisterUserTransport, appCtx components.AppContext) *registerUserUsecase {
+func NewRegisterUserUsecase(
+	repo RegisterUserRepo,
+	transport RegisterUserTransport,
+	appCtx components.AppContext,
+) *registerUserUsecase {
 	return &registerUserUsecase{repo: repo, transport: transport, appCtx: appCtx}
 }
 
-func (u *registerUserUsecase) Register(ctx context.Context, data *entities.UserCreate) (resp *entities.UserCreate, err error) {
+func (u *registerUserUsecase) Register(
+	ctx context.Context,
+	data *entities.UserCreate,
+) (resp *entities.UserCreate, err error) {
 	if user, err := u.repo.FindUser(ctx, map[string]interface{}{"email": data.Email}); user != nil || err != nil {
 		if user != nil {
 			return nil, entities.ErrEmailExisted
@@ -48,7 +55,11 @@ func (u *registerUserUsecase) Register(ctx context.Context, data *entities.UserC
 		return nil, common.ErrInternal(err)
 	}
 
-	if resp, err = u.repo.Create(ctx, data); err != nil {
+	userRole := entities.UserRoleCreate{
+		RoleId: common.RoleUser,
+	}
+
+	if resp, err = u.repo.Create(ctx, data, &userRole); err != nil {
 		return nil, err
 	}
 	resp.Password = ""
@@ -64,7 +75,7 @@ func (u *registerUserUsecase) Register(ctx context.Context, data *entities.UserC
 	u.appCtx.GetLogging().Infof("user data: %v", responseFromMS)
 
 	// Gen new uid for this account
-	resp.SQLModel.GenUID(common.DbTypeAccount)
+	resp.SQLModel.GenUID(common.DbTypeUser)
 
 	return
 }

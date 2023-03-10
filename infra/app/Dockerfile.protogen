@@ -1,0 +1,31 @@
+FROM golang:1.20.2
+
+ENV GO111MODULE 'on'
+ENV GOPROXY 'https://proxy.golang.org,direct'
+ENV TZ='Asia/Ho_Chi_Minh'
+RUN go install github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-grpc-gateway@latest
+RUN go install google.golang.org/protobuf/cmd/protoc-gen-go@latest
+RUN go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@latest
+RUN go install github.com/bufbuild/buf/cmd/buf@v1.14.0
+# RUN echo "AAAAA"
+
+# # FROM webtrack_app
+# # RUN go install github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-grpc-gateway@latest
+# # RUN go install google.golang.org/protobuf/cmd/protoc-gen-go@latest
+# # RUN go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@latest
+
+
+# FROM bufbuild/buf:1.14.0  go
+# WORKDIR /app
+
+# FROM ubuntu:bionic-20221019
+
+# ENV GO111MODULE 'on'
+# RUN apt install wget -y
+# RUN wget -c https://go.dev/dl/go1.20.2.linux-amd64.tar.gz
+# RUN rm -rf /usr/local/go && tar -C /usr/local -xzf go1.20.2.linux-amd64.tar.gz
+# RUN export PATH=$PATH:/usr/local/go/bin
+# RUN go install github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-grpc-gateway@latest
+# RUN go install google.golang.org/protobuf/cmd/protoc-gen-go@latest
+# RUN go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@latest
+# RUN go install github.com/bufbuild/buf/cmd/buf@v1.14.0

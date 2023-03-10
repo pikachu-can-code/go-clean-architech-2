@@ -27,7 +27,6 @@ func main() {
 
 	// init sql connection, this connection will keep alive until the app is closed
 	connStr := env.DBConnectionStr
-	fmt.Println(connStr)
 	db, err := gorm.Open(mysql.Open(connStr), &gorm.Config{})
 	// use db Debug to see sql query
 	// db = db.Debug()
@@ -83,8 +82,8 @@ func runGrpcServices(
 		),
 	)
 	//====== Init all services here ======//
-	proto_v1.RegisterUserServiceServer(s, grpc_services_v1.NewGRPCUserServiceV1(&appCtx))
-	proto_v1.RegisterProductServiceServer(s, grpc_services_v1.NewGRPCProductServiceV1(&appCtx))
+	proto_v1.RegisterUserServiceServer(s, grpc_services_v1.NewGRPCUserServiceV1(appCtx))
+	proto_v1.RegisterProductServiceServer(s, grpc_services_v1.NewGRPCProductServiceV1(appCtx))
 	//====================================//
 	go func() {
 		if err := s.Serve(listen); err != nil {

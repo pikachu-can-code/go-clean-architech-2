@@ -11,11 +11,10 @@ import (
 
 type userTransport struct {
 	appCtx components.AppContext
-	client proto_v1.UserServiceClient
 }
 
-func NewUserTransport(appCtx components.AppContext, conn *grpc.ClientConn) *userTransport {
-	return &userTransport{appCtx: appCtx, client: proto_v1.NewUserServiceClient(conn)}
+func NewUserTransport(appCtx components.AppContext) *userTransport {
+	return &userTransport{appCtx: appCtx}
 }
 
 func (t *userTransport) CallAPIInMicroserviceBlaBla(
@@ -23,7 +22,9 @@ func (t *userTransport) CallAPIInMicroserviceBlaBla(
 	user *entities.User,
 ) (resp *proto_v1.UserResponse, err error) {
 	// Call some grpc API in microservice bla bla
-	resp, err = t.client.Hello(ctx, &proto_v1.UserRequest{Id: user.FakeId.String()})
+	conn, err := grpc.Dial(t.appCtx.GetEnv().UserServiceEndpoint, grpc.WithInsecure())
+	client := proto_v1.NewUserServiceClient(conn)
+	resp, err = client.Hello(ctx, &proto_v1.UserRequest{Id: user.FakeId.String()})
 	if err != nil {
 		return
 	}

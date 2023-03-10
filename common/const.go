@@ -4,8 +4,9 @@ import "time"
 
 const (
 	DbTypeCommon = iota + 1
-	DbTypeAccount
-	DbTypeLink
+	DbTypeUser
+	DbTypeRole
+	DbTypePermission
 )
 
 const (

@@ -7,21 +7,21 @@ import (
 
 type grpcUserServiceV1 struct {
 	proto_v1.UserServiceServer
-	appCtx *components.AppContext
+	appCtx components.AppContext
 }
 
 type grpcProductServiceV1 struct {
 	proto_v1.ProductServiceServer
-	appCtx *components.AppContext
+	appCtx components.AppContext
 }
 
-func NewGRPCUserServiceV1(appCtx *components.AppContext) *grpcUserServiceV1 {
+func NewGRPCUserServiceV1(appCtx components.AppContext) *grpcUserServiceV1 {
 	return &grpcUserServiceV1{
 		appCtx: appCtx,
 	}
 }
 
-func NewGRPCProductServiceV1(appCtx *components.AppContext) *grpcProductServiceV1 {
+func NewGRPCProductServiceV1(appCtx components.AppContext) *grpcProductServiceV1 {
 	return &grpcProductServiceV1{
 		appCtx: appCtx,
 	}

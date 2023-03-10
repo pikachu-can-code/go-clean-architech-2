@@ -1,6 +1,6 @@
 module github.com/nguyen-phi-khanh-monorevo/go-clean-architech-2
 
-go 1.17
+go 1.20
 
 require (
 	github.com/aws/aws-sdk-go v1.43.8

@@ -11,8 +11,8 @@ services:
     volumes:
       - .:/app:cached
     ports:
-      - 5678:5678
-      - 8000:8000
+      - 8080:8080
+      - 8081:8081
     depends_on:
       mysql:
         condition: service_healthy
@@ -22,6 +22,16 @@ services:
           delay: 3s
           max_attempts: 5
           window: 60s
+
+  app-rpc-gen:
+    container_name: app-rpc-gen
+    build:
+      context: .
+      dockerfile: ./infra/app/Dockerfile.protogen
+    env_file: .env
+    working_dir: /app
+    volumes:
+      - .:/app
 
   app-ut:
     container_name: app-for-ut
@@ -56,6 +66,9 @@ services:
     image: mysql:8.0.32
     platform: linux/x86_64
     env_file: .env
+    volumes:
+      - ./.env-ut:/etc/mysql/.env-ut
+      - ./scripts/create_db_test.sh:/etc/mysql/test/create_db_test.sh
     ports:
       - 3307:3306
     healthcheck:

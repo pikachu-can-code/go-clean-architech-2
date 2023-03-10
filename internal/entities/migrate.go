@@ -5,6 +5,8 @@ import "gorm.io/gorm"
 func Migrate(db *gorm.DB) {
 	db.AutoMigrate(
 		&User{},
+		&Permission{},
+		&Role{},
 		//&OtherSchemaNeedMigrate{},
 		//&OtherTableNeedMigrate{},
 		//&OtherEntityNeedMigrate{},

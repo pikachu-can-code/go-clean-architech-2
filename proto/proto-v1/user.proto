@@ -5,20 +5,47 @@ package proto_v1;
 option go_package="github.com/nguyen-phi-khanh-monorevo/go-clean-architech-2/protoc-gen/proto-v1";
 
 import "google/api/annotations.proto";
+import "google/api/field_behavior.proto";
+import "google/protobuf/empty.proto";
 
 message UserRequest {
-  string id = 1;
+    string id = 1 [(google.api.field_behavior) = REQUIRED];
 }
 
 message UserResponse {
-  string message = 1;
+    string message = 1;
+}
+
+message RegistUserRequest {
+    string email = 1;
+    string password = 2;
+    string last_name = 3;
+    string first_name = 4;
+}
+
+message User {
+    string id = 1;
+    string email = 2;
+    string last_name = 3;
+    string first_name = 4;
 }
 
 service UserService {
-  rpc Hello (UserRequest) returns (UserResponse) {
-      option (google.api.http) = {
+    rpc Hello (UserRequest) returns (UserResponse) {
+        option (google.api.http) = {
             post: "/user/v1/hello"
             body: "*"
-      };
-  }
+        };
+    }
+    rpc RegistUser(RegistUserRequest) returns (RegistUserRequest) {
+        option (google.api.http) = {
+            post: "/user/v1/regist"
+            body: "*"
+        };
+    }
+    rpc UserInfo(google.protobuf.Empty) returns (User) {
+        option (google.api.http) = {
+            get: "/user/v1/info"
+        };
+    }
 }

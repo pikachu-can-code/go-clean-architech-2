@@ -15,15 +15,17 @@ type User struct {
 	LastName        string        `json:"last_name" gorm:"column:last_name;size:255;"`
 	FirstName       string        `json:"first_name" gorm:"column:first_name;size:300;"`
 	Phone           string        `json:"phone" gorm:"column:phone;size:15;"`
+	Roles           []Role        `json:"role" gorm:"preload:false;many2many:user_roles;foreignKey:ID;joinForeignKey:UserID;References:ID;JoinReferences:RoleID;"`
 	Avatar          *common.Image `json:"avatar,omitempty" gorm:"column:avatar;type:json"`
 }
 
 type UserCreate struct {
 	common.SQLModel `json:",inline"`
-	Email           string `json:"email" gorm:"column:email;size:300;" binding:"required"`
-	Password        string `json:"password,omitempty" gorm:"column:password;size:500;" binding:"required"`
-	LastName        string `json:"last_name" gorm:"column:last_name;size:255;" binding:"required"`
-	FirstName       string `json:"first_name" gorm:"column:first_name;size:300;" binding:"required"`
+	Email           string   `json:"email" gorm:"column:email;size:300;" binding:"required"`
+	Password        string   `json:"password,omitempty" gorm:"column:password;size:500;" binding:"required"`
+	LastName        string   `json:"last_name" gorm:"column:last_name;size:255;" binding:"required"`
+	FirstName       string   `json:"first_name" gorm:"column:first_name;size:300;" binding:"required"`
+	Role            []string `json:"-" gorm:"-"`
 }
 
 func (u *User) GetUserId() uint64 {
