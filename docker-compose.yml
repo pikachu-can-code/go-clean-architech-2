@@ -42,8 +42,8 @@ services:
     volumes:
       - .:/app:cached
     ports:
-      - 5678:5678
-      - 8001:8000
+      - 8080:8080
+      - 8081:8081
     depends_on:
       mysql:
         condition: service_healthy

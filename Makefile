@@ -25,3 +25,6 @@ gen_proto:
 
 tidy:
 	docker-compose run --rm --entrypoint "go mod tidy" app
+
+unit-test:
+	docker-compose run --rm --entrypoint "go test ./test/... -v " app-test

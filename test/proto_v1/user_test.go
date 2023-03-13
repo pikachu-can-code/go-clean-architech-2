@@ -5,22 +5,16 @@ import (
 	"testing"
 
 	proto_v1 "github.com/nguyen-phi-khanh-monorevo/go-clean-architech-2/protoc-gen/proto/proto-v1"
-	"google.golang.org/grpc"
 )
 
-func HelloTest(t *testing.T) {
+func TestHello(t *testing.T) {
 	ctx := context.Background()
-	conn, err := grpc.DialContext(ctx, "http://0.0.0.0:8080/proto_v1.UserService/Hello",grpc.WithInsecure())
-	if err != nil {
-		t.Errorf("Error connect service: %s", err)
-	}
+
+	client, _, closer := UserServer(ctx, "http://0.0.0.0:8080/proto_v1.UserService/Hello")
 	defer func() {
-		if err := conn.Close(); err != nil {
-			t.Errorf("Error close connection: %s", err)
-		}
+		closer()
 	}()
 
-	client := proto_v1.NewUserServiceClient(conn)
 	resp, err := client.Hello(ctx, &proto_v1.UserRequest{
 		Id: "test",
 	})
