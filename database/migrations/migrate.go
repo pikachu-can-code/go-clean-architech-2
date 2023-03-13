@@ -3,7 +3,7 @@ package migrations
 import (
 	"log"
 
-	"github.com/nguyen-phi-khanh-monorevo/go-clean-architech-2/internal/entities"
+	"github.com/nguyen-phi-khanh-monorevo/go-clean-architech-2/app/module/entities"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 )
